@@ -28,11 +28,23 @@ class userController{
         let update = req.body;
         User.findByIdAndUpdate({_id : req.params.id}, {$set: update}, (err, updatedUser) => {
             if(err){
-                console.log(error);
+                console.log(err);
                 return res.status(500).send({message: "Error"})
             }
             res.status(200).send(updatedUser);
         });
+    }
+
+    static deleteUser = (req, res) => {
+        User.findByIdAndDelete({_id: req.params.id}, (err, Deleteduser) => {
+            if(err){
+                console.log(err);
+                return res.status(500).send({message : "Error"});
+            }
+
+            res.status(200).send(Deleteduser);
+        });
+
     }
 
 }
