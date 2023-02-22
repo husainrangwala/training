@@ -12,6 +12,10 @@ class userController{
     static addNewUser = (req, res) => {
         let user = req.body;
         let newUser = new User(user);
+
+        if(!(user.role === "admin" || user.role === "user")){
+            return res.status(500).send({error: "Invalid role"});
+        }
     
         newUser.save( (err, userDoc) => {
             if(err){
@@ -26,6 +30,11 @@ class userController{
     
     static updateUser = (req,res) => {
         let update = req.body;
+
+        if(!(update.role === "admin" || update.role === "user")){
+            return res.status(500).send({error: "Invalid role"});
+        }
+
         User.findByIdAndUpdate({_id : req.params.id}, {$set: update}, (err, updatedUser) => {
             if(err){
                 console.log(err);
