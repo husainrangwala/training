@@ -3,10 +3,29 @@ const { User } = require("../db/models/user.model");
 
 class userController{
 
-    static getAllUsers = (req, res) => {
-        User.find().then((user) => {
-            res.status(200).send(user);
-        });    
+    static verifyToken = (req, res, next) => {
+        const bearerHeader = req.headers['authorization'];
+        if (typeof bearerHeader !== 'undefined') {
+          const bearer = bearerHeader.split(' ');
+          const bearerToken = bearer[1];
+          req.token = bearerToken;
+          next();
+        } else {
+          res.send({ result: "no login" });
+        }
+    }
+
+    static getAllUsers =(req,res)=> {
+        jwt.verify(req,token,secretKey,(err,authData)=>{
+            if(err){
+                res.send({result: "Invalid Token"})
+            }
+            else{
+                User.find().then((user) => {
+                    res.status(200).send(user);
+                });    
+            }
+        })
     }
 
     static addNewUser = (req, res) => {
@@ -23,7 +42,9 @@ class userController{
                 res.sendStatus(400);
             }
             else{
-                res.status(200).send({"id": userDoc._id});
+                jwt.sign({newUser},secretKey,{expiresIn:'300s'},(err,token)=>{
+                    res.status(200).send({"id": userDoc._id,"token":token});
+                })
             }
         })
     }
